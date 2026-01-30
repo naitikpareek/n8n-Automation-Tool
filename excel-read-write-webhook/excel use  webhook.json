@@ -1,0 +1,296 @@
+{
+  "name": "excel use  webhook",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "excel-data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4305009a-2326-49ff-81f9-9daf0b551c20",
+      "name": "Webhook",
+      "webhookId": "98c92fbd-7de0-4088-9e46-6d9800829a01",
+      "alwaysOutputData": true,
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1x3VdIIxt8jzMusHnRx0vcR8_PVZja8jn",
+          "mode": "list",
+          "cachedResultName": "detail file.xlsx",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1x3VdIIxt8jzMusHnRx0vcR8_PVZja8jn/edit?usp=drivesdk&ouid=105382746437568766804&rtpof=true&sd=true"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "9c057366-53ea-401c-aea3-9bada7a422a6",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "RsCLBBxWg6UK9LJm",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1I7PMRT6axr1n5P5IkAmPj1pOvLBfJBh6jaRo8O5cuzA",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1I7PMRT6axr1n5P5IkAmPj1pOvLBfJBh6jaRo8O5cuzA/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        416,
+        0
+      ],
+      "id": "be517b58-6579-4af2-843d-4adb7667bee9",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0rgBvpMGVzAJ01sM",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5877707c-d031-4183-a9e7-67af483cd295",
+              "name": "First Name",
+              "value": "Naitik",
+              "type": "string"
+            },
+            {
+              "id": "cfb7937b-6cab-4db4-95b2-ddc5a3ea0a03",
+              "name": "last name",
+              "value": "Pareek",
+              "type": "string"
+            },
+            {
+              "id": "5497a646-444c-41c6-8f68-ea7ba27e2e94",
+              "name": "Email",
+              "value": "naitik123@gmail.com",
+              "type": "string"
+            },
+            {
+              "id": "fb6d30d9-4b97-400a-b01b-04ab4d7ba9bd",
+              "name": "Mobile Number",
+              "value": 7852024862,
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        0
+      ],
+      "id": "a3868975-1c46-41c9-9ef7-404c06fa60cd",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1I7PMRT6axr1n5P5IkAmPj1pOvLBfJBh6jaRo8O5cuzA",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1I7PMRT6axr1n5P5IkAmPj1pOvLBfJBh6jaRo8O5cuzA/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last name",
+              "displayName": "last name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email address",
+              "displayName": "email address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        832,
+        0
+      ],
+      "id": "d94387cc-a90c-4e38-8f47-7ac5b78e3831",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "rA8YwYbVmt2NwVWx",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "updated_details.xlsx",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "92c711b0-e569-4c57-b20c-661fa16618bd",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "RsCLBBxWg6UK9LJm",
+          "name": "Google Drive account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "c0426887-8c2c-405d-b002-fb136b4015ee",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d0960590361dda640582d806301dd813e579602c76be959e9da0cc58155295ef"
+  },
+  "id": "dhxFOZwbiTIXjpmWJdM5w",
+  "tags": []
+}

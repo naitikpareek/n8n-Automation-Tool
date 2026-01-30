@@ -1,0 +1,213 @@
+# WhatsApp Bot using n8n – Detailed Report
+
+## 1. Project Overview
+
+This project explains how to create a **WhatsApp Bot using n8n** that:
+
+* Reads messages sent from **actual WhatsApp users** (via WhatsApp Business Cloud API)
+* Automatically **stores those messages in Excel / Google Sheets**
+* Optionally sends an **auto-reply** back to the user
+
+This report is written so it can be **easily explained to a manager, client, or interviewer**.
+
+---
+
+## 2. Objective of the Bot
+
+The main objectives are:
+
+1. Receive incoming WhatsApp messages in real time
+2. Extract useful data (sender number, message text, time)
+3. Save each message as a new row in Excel / Google Sheets
+4. (Optional) Send an automatic reply to the user
+
+---
+
+## 3. Technologies Used
+
+* **n8n**: Workflow automation tool
+* **WhatsApp Business Cloud API (Meta)**: To receive and send WhatsApp messages
+* **Webhook**: Used as a trigger for WhatsApp events
+* **Google Sheets / Excel**: To store messages
+
+---
+
+## 4. Overall Workflow Architecture
+
+```
+WhatsApp User
+     ↓
+Meta WhatsApp Cloud API
+     ↓
+n8n Webhook (Trigger)
+     ↓
+Edit Fields (Set Node)
+     ↓
+Append Row in Sheet (Excel / Google Sheets)
+     ↓
+(Optional) HTTP Request – Auto Reply
+```
+
+---
+
+## 5. Step-by-Step Workflow Explanation
+
+### Step 1: Webhook Node (Trigger)
+
+* The Webhook node acts as the **WhatsApp trigger**
+* Whenever a user sends a message on WhatsApp, Meta sends a POST request to this Webhook URL
+* This starts the workflow automatically
+
+**Why Webhook?**
+
+* WhatsApp does not provide a separate trigger node
+* Webhook is the official and only way to receive WhatsApp events
+
+---
+
+### Step 2: Edit Fields (Set Node)
+
+* This node is used to **read and clean the incoming WhatsApp data**
+* We extract important fields:
+
+  * `from` → Sender’s WhatsApp number
+  * `message` → Text message body
+  * `timestamp` → Time when message was sent
+
+**Purpose:**
+
+* Makes raw WhatsApp JSON data simple and structured
+* Prepares data for Excel/Sheets
+
+---
+
+### Step 3: Append Row in Sheet (Excel / Google Sheets)
+
+* This node saves the message data into a spreadsheet
+* Each WhatsApp message is saved as a **new row**
+
+**Why “Append row in sheet”?**
+
+* WhatsApp messages are continuous
+* We do not want to overwrite old data
+* Each new message must be stored safely
+
+**Example Sheet Structure:**
+
+| from   | message | timestamp  |
+| ------ | ------- | ---------- |
+| 91xxxx | Hi      | 1700000000 |
+
+---
+
+### Step 4 (Optional): Auto Reply to User
+
+* An HTTP Request node is used to send a reply via WhatsApp Cloud API
+* Example auto-reply message:
+
+  > "Thanks for your message! We have received it."
+
+**Benefits:**
+
+* Improves user experience
+* Confirms message receipt
+
+---
+
+## 6. Key Points to Explain Easily
+
+* Webhook = WhatsApp Trigger
+* Set Node = Message reader & formatter
+* Append Row = Permanent message storage
+* Auto-reply = Optional enhancement
+
+---
+
+## 7. Final Outcome
+
+* WhatsApp messages are received in real time
+* Data is automatically saved in Excel / Google Sheets
+* Manual work is eliminated
+* System is scalable and production-ready
+
+---
+
+## 8. Conclusion
+
+This WhatsApp Bot built using n8n provides a **simple, reliable, and automated solution** for capturing WhatsApp messages and storing them in Excel. It is ideal for customer support logs, lead capture, and reporting purposes.
+
+**Status:** ✅ Workflow Verified & Functional
+
+---
+
+## 9. One-Line Explanation (For Interviews / Demos)
+
+> "This n8n workflow uses WhatsApp Cloud API webhooks to capture real WhatsApp messages, process them, and store each message automatically in Excel with optional auto-replies."
+
+---
+
+## EOD Report – WhatsApp Bot (n8n)
+
+### Workflow Summary
+
+**Webhook (Incoming WhatsApp Message)**
+→ **Edit Fields (Set)**
+→ **Append Row in Sheet (Excel/Google Sheet)**
+→ **HTTP Request (Auto Reply on WhatsApp)**
+
+### Step-wise Details
+
+1. **Webhook**
+
+   * Receives incoming WhatsApp messages from Meta (Cloud API).
+   * Trigger point of the workflow.
+   * Captures payload like sender number, message text, timestamp.
+
+2. **Edit Fields (Set Node)**
+
+   * Extracts and formats required data from webhook payload.
+   * Common fields:
+
+     * `from` (sender phone number)
+     * `message` (text body)
+     * `timestamp`
+   * Prepares clean data for Excel and reply.
+
+3. **Append Row in Sheet**
+
+   * Saves incoming WhatsApp data into Excel / Google Sheet.
+   * Each message is stored as a new row.
+   * Columns example:
+
+     * Timestamp
+     * Phone Number
+     * Message
+
+4. **HTTP Request (WhatsApp Reply)**
+
+   * Sends an automatic reply back to the user via WhatsApp Cloud API.
+   * Uses POST request to Meta Graph API.
+   * Sample reply:
+
+     * “Thanks! Your message has been saved successfully.”
+
+### Final Outcome
+
+* WhatsApp message is received in real-time.
+* Message data is safely stored in Excel.
+* User instantly gets a confirmation reply on WhatsApp.
+
+### Use Case
+
+* Customer inquiry logging
+* Lead collection
+* Support ticket creation
+* WhatsApp-based data entry
+
+### Status
+
+✅ Workflow tested
+✅ Data saving confirmed
+✅ Auto-reply working
+
+---

@@ -1,0 +1,194 @@
+{
+  "name": "whatsapp intergation",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        16
+      ],
+      "id": "d426721f-71b8-471d-a50b-e80dfd6a74c8",
+      "name": "WhatsApp Trigger",
+      "webhookId": "ffdc2122-9fa6-4f44-9b6d-6813a850489d"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c6ab61d5-e086-41a2-a8bd-c283f906722c",
+              "name": "phone",
+              "value": "={{$json.entry[0].changes[0].value.messages[0].from}}",
+              "type": "string"
+            },
+            {
+              "id": "8facbb6c-b95c-4336-b72e-ce46e741fcb7",
+              "name": "message",
+              "value": "={{$json.entry[0].changes[0].value.messages[0].text.body}}",
+              "type": "string"
+            },
+            {
+              "id": "7301c694-1bdf-49dc-b4b2-48459a176137",
+              "name": "timestamp",
+              "value": "={{$json.entry[0].changes[0].value.messages[0].timestamp}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        32,
+        16
+      ],
+      "id": "e572f2a0-5df6-481c-8f0b-c40fc525ca75",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1I7PMRT6axr1n5P5IkAmPj1pOvLBfJBh6jaRo8O5cuzA",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1I7PMRT6axr1n5P5IkAmPj1pOvLBfJBh6jaRo8O5cuzA/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last name",
+              "displayName": "last name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email address",
+              "displayName": "email address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        240,
+        64
+      ],
+      "id": "6298934e-cf1a-4bf4-9c2d-0fdbfd9fb94c",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "rA8YwYbVmt2NwVWx",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        64
+      ],
+      "id": "784a6ba0-3f7d-4ff4-8fdc-356c5834293b",
+      "name": "Send message",
+      "webhookId": "c9b5de91-42e4-42d1-96f0-b2675251b373"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "3a71354f-6774-4ccc-a0b0-2252cb8503da",
+  "meta": {
+    "instanceId": "d0960590361dda640582d806301dd813e579602c76be959e9da0cc58155295ef"
+  },
+  "id": "_jXjA5LpuVcVgIM-kR7_P",
+  "tags": []
+}

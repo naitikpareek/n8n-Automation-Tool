@@ -1,0 +1,101 @@
+Perfect 👍
+Main **“workflow” section add** kar raha hoon — short, clean, GitHub-ready, aur **task word bilkul nahi** use kiya hai.
+
+Tum isko **README.md** me directly paste kar sakte ho 👇
+
+---
+
+## 📌 WhatsApp API Integration – n8n
+
+### 🔹 Overview
+
+This project demonstrates a WhatsApp automation **workflow** built using **n8n**. The workflow receives incoming WhatsApp messages, structures the data, stores it in Google Sheets, and prepares automated responses using the WhatsApp API.
+
+---
+
+## 🔄 Workflow
+
+### **Workflow Flow**
+
+```
+WhatsApp Trigger
+      ↓
+Edit Fields (Set)
+      ↓
+Google Sheets (Append Row)
+      ↓
+WhatsApp Send Message
+```
+
+---
+
+### **WhatsApp Trigger**
+
+* Listens for incoming WhatsApp messages.
+* Captures message payload such as sender details and message content.
+* Workflow execution is currently paused due to incomplete WhatsApp Meta API configuration.
+
+---
+
+### **Edit Fields (Set)**
+
+* Structures incoming data into a clean and usable format.
+* Extracts required fields:
+
+  * Sender name
+  * Phone number
+  * Message text
+* Ensures consistent data for downstream nodes.
+
+---
+
+### **Google Sheets – Append Row**
+
+* Appends structured message data into a Google Sheet.
+* Maps workflow fields directly to sheet columns.
+* Enables real-time logging of WhatsApp messages.
+
+---
+
+### **WhatsApp Send Message**
+
+* Prepares automated replies to WhatsApp users.
+* Configured to send messages dynamically based on incoming data.
+* Message delivery pending due to missing Meta API credentials:
+
+  * Access Token
+  * Phone Number ID
+  * WhatsApp Business Account setup
+
+---
+
+## ⚙️ Tools & Technologies
+
+* n8n
+* WhatsApp Meta API
+* Google Sheets
+* Webhooks
+
+---
+
+## 🚀 Current Status
+
+* Workflow logic and data flow validated successfully.
+* WhatsApp send/receive testing pending Meta API completion.
+
+---
+
+## 🎯 Learning Outcome
+
+* Designed end-to-end WhatsApp automation workflow in n8n
+* Structured and transformed incoming data
+* Integrated Google Sheets for message logging
+* Understood real-world API authentication dependencies
+
+---
+
+### 🔥 One-Line Summary
+
+> End-to-end WhatsApp automation workflow using n8n with Google Sheets integration.
+
+

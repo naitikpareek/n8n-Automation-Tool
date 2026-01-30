@@ -1,0 +1,107 @@
+
+## 📌 Project Report: n8n Excel Automation Workflow
+
+### 🔹 Overview
+
+This project implements an end-to-end automation workflow using **n8n** to collect data via webhook, process it, update an Excel file, and store the updated file on **Google Drive**.
+
+---
+
+### 🔹 Workflow Summary
+
+#### 1️⃣ Workflow Trigger & Webhook
+
+* Workflow can be triggered using both **Manual Trigger** and **Webhook**.
+* Webhook configured with **HTTP GET method** and no authentication.
+* Verified successful execution through test webhook URL.
+
+#### 2️⃣ Google Drive Access & Excel Download
+
+* Connected Google Drive account in n8n.
+* Downloaded an Excel (.xlsx) file using **File ID**.
+* Ensured the file is received correctly in binary format.
+
+#### 3️⃣ Excel Sheet Read
+
+* Used **Spreadsheet File (Read)** node to extract Excel data.
+* Configured with correct binary property (`data`) and XLSX format.
+* Successfully converted Excel rows into structured JSON.
+
+#### 4️⃣ Data Preparation
+
+* Used **Edit Fields (Set)** node to prepare input fields:
+
+  * First Name
+  * Last Name
+  * Email
+  * Phone Number
+* Mapped incoming data from webhook or manual input.
+
+#### 5️⃣ Excel File Update
+
+* Appended new records using **Spreadsheet File (Write)** node.
+* Verified that new rows are added correctly to the Excel file.
+
+#### 6️⃣ Upload Updated Excel to Google Drive
+
+* Uploaded the updated Excel file back to Google Drive.
+* Confirmed successful storage with latest data.
+
+---
+
+### 🔹 Outcome
+
+* Fully automated workflow from data input to Excel update.
+* Supports dynamic data via webhook.
+* Eliminates manual Excel handling and ensures data consistency.
+
+---
+
+### 🔹 Tech Stack
+
+* **n8n**
+* **Google Drive API**
+* **Excel (.xlsx)**
+* **Webhook (HTTP GET)**
+
+----
+
+
+
+## 🔄 Workflow (End-to-End Automation)
+
+```
+Manual Trigger / Webhook
+        ↓
+Google Drive (Download Excel File)
+        ↓
+Spreadsheet File (Read Excel)
+        ↓
+Edit Fields (Prepare User Data)
+        ↓
+Spreadsheet File (Write / Append Row)
+        ↓
+Google Drive (Upload Updated Excel)
+```
+
+---
+
+### 🧩 Workflow Explanation (Short)
+
+* **Trigger:** Workflow can be started manually or via webhook request.
+* **Download:** Excel file is fetched from Google Drive using File ID.
+* **Read:** Existing Excel data is read and converted into JSON.
+* **Prepare Data:** Incoming user details (First Name, Last Name, Email, Phone) are structured using Edit Fields.
+* **Update Excel:** New data is appended as a new row in the Excel file.
+* **Upload:** Updated Excel file is uploaded back to Google Drive.
+
+---
+
+### ✅ Key Features
+
+* Supports **manual & webhook-based execution**
+* Dynamic data handling
+* Automated Excel update
+* Cloud-based storage on Google Drive
+* Beginner-friendly and scalable workflow
+

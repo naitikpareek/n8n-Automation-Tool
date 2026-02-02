@@ -1,0 +1,417 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "create-invoice",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -64,
+        0
+      ],
+      "id": "65669aa5-4ffb-4786-a04b-f77b351ff27d",
+      "name": "Webhook",
+      "webhookId": "a549df6e-a03f-4857-86fb-c1892caf570d"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1️⃣ Webhook se aaya hua data\nconst data = $input.all()[0].json;\n\n// 2️⃣ Safe number conversion\nconst qty = Number(data.quantity || 0);\nconst rate = Number(data.rate || 0);\nconst gstPercent = Number(data.gst_percent || 0);\n\n// 3️⃣ Calculations\nconst amount = qty * rate;\nconst gstAmount = (amount * gstPercent) / 100;\nconst totalAmount = amount + gstAmount;\n\n// 4️⃣ Final structured output (Next steps ke liye)\nreturn [\n  {\n    json: {\n      // Ledger / Party info\n      party_name: data.party_name,\n\n      // Invoice info\n      invoice_no: data.invoice_no,\n      invoice_date: data.invoice_date,\n\n      // Item info\n      item_name: data.item_name,\n      quantity: qty,\n      rate: rate,\n\n      // Amounts\n      amount: amount,\n      gst_percent: gstPercent,\n      gst_amount: gstAmount,\n      total_amount: totalAmount,\n\n      // Notification info (future steps)\n      email: data.email,\n      phone: data.phone\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        128,
+        0
+      ],
+      "id": "0255d962-c406-4c73-920a-a6c0c04dcafa",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "697b9823-818f-4d70-aa05-743c8398953c",
+              "leftValue": "={{$json.status}}",
+              "rightValue": "success",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1536,
+        32
+      ],
+      "id": "56663db3-4f51-44b3-9285-7a101040185a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "naitik123@gmail.com",
+        "subject": "❌ Invoice Creation Failed – Tally",
+        "message": "=<b>Hello Team,</b><br><br>  Invoice <b>Tally me create nahi ho paya</b>.<br><br>  <b>Error Details:</b><br> Status: {{ $json.status }}<br> Message: {{ $json.message || 'No response from Tally' }}<br><br>  <b>Invoice Info:</b><br> Customer Name: {{ $json.customerName }}<br> Invoice No: {{ $json.invoiceNo }}<br> Amount: ₹{{ $json.amount }}<br><br>  Please check Tally server / XML format and retry.<br><br>  Regards,<br> <b>n8n Automation System</b>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1728,
+        176
+      ],
+      "id": "38b9a155-083d-42b2-a801-f74a4f9b9cd3",
+      "name": "Send a message",
+      "webhookId": "472b47b3-3c3b-47e8-9e2b-4899107d0d98",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xtHW3309JdVmTLZr",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:9000/check-ledger",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"party_name\": \"{{ $json.party_name }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        336,
+        0
+      ],
+      "id": "0824c9a6-f545-48fa-83b6-ebfba7ab0523",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "389d567f-f484-4c9f-b563-74b95831b975",
+              "leftValue": "={{ $json.ledgerExists }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        512,
+        16
+      ],
+      "id": "1342bba1-77e3-45e1-94e2-12d881294d12",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/<PHONE_NUMBER_ID>/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_WHATSAPP_TOKEN"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $json.phone }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"✅ Invoice Created Successfully\\nInvoice No: {{ $json.invoice_no }}\\nAmount: {{ $json.amount }}\"\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1792,
+        -48
+      ],
+      "id": "efe4a84b-7848-4e30-91ba-6b0d537ebaa5",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:9000/ledger/create",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"party_name\": \"{{ $json.party_name }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        624,
+        208
+      ],
+      "id": "513149e6-b25d-4f4f-8f39-0cb834e4de01",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:9000/invoice/create",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"party_name\": \"{{ $json.party_name }}\",\n  \"invoice_no\": \"{{ $json.invoice_no }}\",\n  \"invoice_date\": \"{{ $json.invoice_date }}\",\n  \"item_name\": \"{{ $json.item_name }}\",\n  \"quantity\": {{ $json.quantity }},\n  \"rate\": {{ $json.rate }},\n  \"amount\": {{ $json.amount }},\n  \"gst_percent\": {{ $json.gst_percent }},\n  \"gst_amount\": {{ $json.gst_amount }},\n  \"total_amount\": {{ $json.total_amount }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        848,
+        224
+      ],
+      "id": "440ebb95-ce79-481d-af5e-d3838fc83ecc",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:9000/invoice/create",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"party_name\": \"{{ $json.party_name }}\",\n  \"invoice_no\": \"{{ $json.invoice_no }}\",\n  \"invoice_date\": \"{{ $json.invoice_date }}\",\n  \"item_name\": \"{{ $json.item_name }}\",\n  \"quantity\": {{ $json.quantity }},\n  \"rate\": {{ $json.rate }},\n  \"amount\": {{ $json.amount }},\n  \"gst_percent\": {{ $json.gst_percent }},\n  \"gst_amount\": {{ $json.gst_amount }},\n  \"total_amount\": {{ $json.total_amount }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        752,
+        -48
+      ],
+      "id": "ff992668-bde8-420e-98f1-e9f3f8309608",
+      "name": "HTTP Request5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:9000/export-invoice-pdf",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"invoice_no\": \"{{ $json.invoice_no }}\",\n  \"voucher_type\": \"Sales\",\n  \"company\": \"ABC Pvt Ltd\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1104,
+        48
+      ],
+      "id": "9a39fac2-237d-490e-97e8-d8412d4e57aa",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "name": "=Invoice_{{ $json.invoice_no }}.pdf",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1312,
+        48
+      ],
+      "id": "311a7c7e-733b-4c14-95f8-7a3a43d43e31",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "RsCLBBxWg6UK9LJm",
+          "name": "Google Drive account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request5": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "96f7732f-504d-40b3-ab91-da0b3146199d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d0960590361dda640582d806301dd813e579602c76be959e9da0cc58155295ef"
+  },
+  "id": "xLEzpEBxdEh0WjftKFa4z",
+  "tags": []
+}

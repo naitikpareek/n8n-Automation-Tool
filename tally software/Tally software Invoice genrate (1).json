@@ -1,0 +1,240 @@
+{
+  "name": "Tally software Invoice genrate",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "create-invoice",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2426fd35-8fb1-4e3f-b1be-f45002db40e1",
+      "name": "Webhook",
+      "webhookId": "a549df6e-a03f-4857-86fb-c1892caf570d"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Webhook se aane wala data\nconst data = $input.all()[0].json;\n\nconst qty = Number(data.quantity);\nconst rate = Number(data.rate);\nconst gstPercent = Number(data.gst_percent);\n\n// Calculations\nconst amount = qty * rate;\nconst gstAmount = (amount * gstPercent) / 100;\nconst totalAmount = amount + gstAmount;\n\n// Output for next step\nreturn [\n  {\n    json: {\n      party_name: data.party_name,\n      invoice_no: data.invoice_no,\n      invoice_date: data.invoice_date,\n      item_name: data.item_name,\n      quantity: qty,\n      rate: rate,\n      amount: amount,\n      gst_percent: gstPercent,\n      gst_amount: gstAmount,\n      total_amount: totalAmount\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "02a4471d-8380-4169-8444-8917ee8c23a8",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.all()[0].json;\n\nconst xml = `\n<ENVELOPE>\n  <HEADER>\n    <TALLYREQUEST>Import Data</TALLYREQUEST>\n  </HEADER>\n  <BODY>\n    <IMPORTDATA>\n      <REQUESTDESC>\n        <REPORTNAME>Vouchers</REPORTNAME>\n        <STATICVARIABLES>\n          <SVCURRENTCOMPANY>My Company Pvt Ltd</SVCURRENTCOMPANY>\n        </STATICVARIABLES>\n      </REQUESTDESC>\n\n      <REQUESTDATA>\n        <TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n          <VOUCHER VCHTYPE=\"Sales\" ACTION=\"Create\">\n            <DATE>${d.invoice_date}</DATE>\n            <VOUCHERNUMBER>${d.invoice_no}</VOUCHERNUMBER>\n            <VOUCHERTYPENAME>Sales</VOUCHERTYPENAME>\n            <PARTYLEDGERNAME>${d.party_name}</PARTYLEDGERNAME>\n            <PERSISTEDVIEW>Invoice Voucher View</PERSISTEDVIEW>\n\n            <ALLINVENTORYENTRIES.LIST>\n              <STOCKITEMNAME>${d.item_name}</STOCKITEMNAME>\n              <RATE>${d.rate}</RATE>\n              <ACTUALQTY>${d.quantity} Nos</ACTUALQTY>\n              <BILLEDQTY>${d.quantity} Nos</BILLEDQTY>\n              <AMOUNT>${d.amount}</AMOUNT>\n            </ALLINVENTORYENTRIES.LIST>\n\n            <LEDGERENTRIES.LIST>\n              <LEDGERNAME>${d.party_name}</LEDGERNAME>\n              <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>\n              <AMOUNT>${d.total_amount}</AMOUNT>\n            </LEDGERENTRIES.LIST>\n\n          </VOUCHER>\n        </TALLYMESSAGE>\n      </REQUESTDATA>\n    </IMPORTDATA>\n  </BODY>\n</ENVELOPE>\n`;\n\nreturn [\n  {\n    json: {\n      tally_xml: xml\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "55ab5e55-f675-4ac4-ab0c-13fe7d4b232e",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:9000",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/xml"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "XML",
+        "body": "={{$json.tally_xml}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        624,
+        0
+      ],
+      "id": "fd5beabe-2f11-4bfb-80ae-da3e492e6ddb",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "697b9823-818f-4d70-aa05-743c8398953c",
+              "leftValue": "={{$json.status}}",
+              "rightValue": "success",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        832,
+        0
+      ],
+      "id": "c296f32c-c5b6-4dc9-9f76-788b39a45ea9",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/<PHONE_NUMBER_ID>/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_WHATSAPP_TOKEN"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $json.phone }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"✅ Invoice Created Successfully\\nInvoice No: {{ $json.invoice_no }}\\nAmount: {{ $json.amount }}\"\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1040,
+        -96
+      ],
+      "id": "0124ebc4-bd80-480c-83da-3e3a2a889e0f",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "sendTo": "naitik123@gmail.com",
+        "subject": "❌ Invoice Creation Failed – Tally",
+        "message": "=<b>Hello Team,</b><br><br>  Invoice <b>Tally me create nahi ho paya</b>.<br><br>  <b>Error Details:</b><br> Status: {{ $json.status }}<br> Message: {{ $json.message || 'No response from Tally' }}<br><br>  <b>Invoice Info:</b><br> Customer Name: {{ $json.customerName }}<br> Invoice No: {{ $json.invoiceNo }}<br> Amount: ₹{{ $json.amount }}<br><br>  Please check Tally server / XML format and retry.<br><br>  Regards,<br> <b>n8n Automation System</b>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        96
+      ],
+      "id": "97aaa54d-1e68-4ab3-b523-00b9b586cfa6",
+      "name": "Send a message",
+      "webhookId": "472b47b3-3c3b-47e8-9e2b-4899107d0d98",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xtHW3309JdVmTLZr",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "91222e05-6a1c-4d70-a8aa-77e0746461da",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d0960590361dda640582d806301dd813e579602c76be959e9da0cc58155295ef"
+  },
+  "id": "z-mbd2D8I579NbfMuiPNA",
+  "tags": []
+}

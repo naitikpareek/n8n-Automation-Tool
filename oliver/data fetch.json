@@ -1,0 +1,118 @@
+{
+  "name": "data fetch",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "wGSnq7ccOaGWGG7m",
+          "mode": "list",
+          "cachedResultName": "Insight table",
+          "cachedResultUrl": "/projects/8wLWljIEbE0MkY60/datatables/wGSnq7ccOaGWGG7m"
+        },
+        "matchType": "allConditions"
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        192
+      ],
+      "id": "2e84b725-ab33-45a5-99f1-8f3edff62b17",
+      "name": "Get row(s)"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  return {\n    json: {\n      totalParts: item.json.total_parts,\n      totalQuantity: Number(item.json.total_quantity.toFixed(2)),\n      topPartNumber: item.json.top_partNumber,\n      topQuantity: item.json.top_qty,\n      lowestPartNumber: item.json.lowest_partNumber,\n      lowestQuantity: item.json.lowest_qty\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        192
+      ],
+      "id": "3a84b0ab-b667-4af6-b2f1-1289d6cb9ae9",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        624,
+        192
+      ],
+      "id": "71018bf0-1655-49c5-8e6f-28c0ff209acf",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "path": "part_analysis",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        192
+      ],
+      "id": "bfdd165a-69dd-4fdf-82b4-bbe40c84a068",
+      "name": "Webhook",
+      "webhookId": "9fbbb8e5-fee3-4011-b4a0-8ead0af34cf4"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3aba6dd7-088f-43a3-9b8f-f0fd58788cea",
+  "meta": {
+    "instanceId": "6993252f32c5018379eeb5ad4a48087f25f1905c450639b58bd22b9836b46f78"
+  },
+  "id": "jafL1hjaD5rtFO1S",
+  "tags": []
+}
